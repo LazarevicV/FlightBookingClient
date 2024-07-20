@@ -8,6 +8,20 @@ export type FlightType = {
   isDirectFlight: boolean;
 };
 
+export type Flight = {
+  id: number;
+  arrivalDateTime: string;
+  departureCity: string;
+  departureCityId: number;
+  departureDateTime: string;
+  destinationCity: string;
+  destinationCityId: number;
+  numberOfAvailableSpots: number;
+  numberOfSeats: number;
+  numberOfStops: number;
+  status: string;
+};
+
 export type City = {
   id: string;
   name: string;

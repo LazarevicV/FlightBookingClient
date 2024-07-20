@@ -18,23 +18,24 @@ import { getFlights, getCities } from "@/lib/queries";
 import { QUERY_KEYS } from "@/lib/constants";
 import { DatePickerWithRange } from "./DatePickerComponent";
 import FlightsList from "./FlightsList";
-import { City, FlightType } from "@/lib/types";
+import { City, Flight, FlightType } from "@/lib/types";
 import { DateRange } from "react-day-picker";
 
 function FlightForm() {
-  const [departureCity, setDepartureCity] = React.useState("");
-  const [destinationCity, setDestinationCity] = React.useState("");
+  const [departureCity, setDepartureCity] = React.useState<
+    string | undefined
+  >();
+  const [destinationCity, setDestinationCity] = React.useState<
+    string | undefined
+  >();
   const [date, setDate] = React.useState<DateRange | undefined>();
   const [isDirectFlight, setIsDirectFlight] = React.useState(false);
   const [numberOfPassengers, setNumberOfPassengers] = React.useState(1);
-  const [flights, setFlights] = React.useState<FlightType[]>([]);
+  const [flights, setFlights] = React.useState<Flight[]>([]);
   const [searchInitiated, setSearchInitiated] = React.useState(false);
 
-  // Format dates for MySQL
   const formattedFromDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
   const formattedToDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
-
-  console.log(formattedFromDate, formattedToDate);
 
   const {
     data: cities,
@@ -48,15 +49,12 @@ function FlightForm() {
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error</div>;
 
-  console.log(cities);
-
   const handleSearch = async () => {
-    // Fetch flights based on user input
     if (!departureCity || !destinationCity || !formattedFromDate) {
       return;
     }
 
-    const flights = await getFlights(
+    const result: any = await getFlights(
       Number(departureCity),
       Number(destinationCity),
       formattedFromDate,
@@ -65,7 +63,8 @@ function FlightForm() {
       numberOfPassengers
     );
 
-    setFlights(flights);
+    setFlights(result.departureFlights || result.returnFlights);
+    console.log(flights);
     setSearchInitiated(true);
   };
 
@@ -76,7 +75,6 @@ function FlightForm() {
           Pretraga letova
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Departure City */}
           <div>
             <Label className="block mb-2 text-sm font-medium text-gray-700">
               Izaberite grad polaska
@@ -87,7 +85,7 @@ function FlightForm() {
               </SelectTrigger>
               <SelectContent>
                 {cities?.map((city: City) => (
-                  <SelectItem key={city.id} value={city.id}>
+                  <SelectItem key={city.id} value={city.id.toString()}>
                     {city.name}
                   </SelectItem>
                 ))}
@@ -95,7 +93,6 @@ function FlightForm() {
             </Select>
           </div>
 
-          {/* Destination City */}
           <div>
             <Label className="block mb-2 text-sm font-medium text-gray-700">
               Izaberite grad dolaska
@@ -106,7 +103,7 @@ function FlightForm() {
               </SelectTrigger>
               <SelectContent>
                 {cities?.map((city) => (
-                  <SelectItem key={city.id} value={city.id}>
+                  <SelectItem key={city.id} value={city.id.toString()}>
                     {city.name}
                   </SelectItem>
                 ))}
@@ -114,7 +111,6 @@ function FlightForm() {
             </Select>
           </div>
 
-          {/* Number of Passengers */}
           <div>
             <Label className="block mb-2 text-sm font-medium text-gray-700">
               Broj putnika
@@ -128,7 +124,6 @@ function FlightForm() {
             />
           </div>
 
-          {/* Calendar */}
           <div>
             <Label className="block mb-2 text-sm font-medium text-gray-700">
               Datum polaska
@@ -137,12 +132,10 @@ function FlightForm() {
           </div>
         </div>
 
-        {/* Search Button */}
         <div className="mt-8 flex justify-center">
           <Button onClick={handleSearch}>Pretrazi</Button>
         </div>
 
-        {/* Direct Flight Checkbox */}
         <div className="mt-4 flex items-center">
           <Checkbox
             checked={isDirectFlight}
@@ -153,9 +146,7 @@ function FlightForm() {
             Direktan let
           </label>
         </div>
-        <p>letovi</p>
       </div>
-      {/* Display selected dates for flights */}
 
       {formattedFromDate && formattedToDate && (
         <div className="mt-4 text-center">
