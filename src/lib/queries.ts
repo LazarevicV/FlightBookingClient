@@ -32,3 +32,29 @@ export const getCities = async (): Promise<City[]> => {
   const res = await api({ endpoint: "api/City" });
   return res.data;
 };
+
+export const login = async (
+  email: string,
+  password: string
+): Promise<{ token: string }> => {
+  try {
+    console.log("Sending login request:", { email, password });
+
+    const res = await api({
+      endpoint: "api/Token",
+      config: {
+        method: "POST",
+        data: {
+          email,
+          password,
+        },
+      },
+    });
+
+    console.log("Login response:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
+};

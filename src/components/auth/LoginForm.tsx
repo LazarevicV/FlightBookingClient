@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-// import useAuth from "@/hooks/useAuth";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,16 +12,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { login } from "@/lib/queries";
+import useAuth from "@/hooks/useAuth";
 
 const LoginForm: React.FC<{ className?: string }> = ({ className }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  //   const { login, error } = useAuth();
+  const { login, error } = useAuth();
 
-  //   const handleLogin = async () => {
-  //     await login({ username, password });
-  //   };
+  const handleLogin = async () => {
+    await login({ email, password });
+  };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -63,9 +65,10 @@ const LoginForm: React.FC<{ className?: string }> = ({ className }) => {
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
-        {/* <Button onClick={handleLogin} className="w-full"> */}
-        <Button className="w-full">Sign in</Button>
-        {/* <p className="text-red-500 my-2">{error && <div>{error}</div>}</p> */}
+        <Button onClick={handleLogin} className="w-full">
+          Sign in
+        </Button>
+        <p className="text-red-500 my-2">{error && <div>{error}</div>}</p>
       </CardFooter>
     </Card>
   );

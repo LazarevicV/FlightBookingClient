@@ -1,19 +1,18 @@
 import React, { useEffect } from "react";
-
 import { LoginForm } from "@/components/auth/LoginForm";
 import { cn } from "../../lib/utils";
 import { Link, useNavigate } from "@tanstack/react-router";
-// import useAuth from "@/hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 
 const LoginPage: React.FC<{ className?: string }> = ({ className }) => {
-  //   const navigate = useNavigate();
-  //   const { isAuth } = useAuth();
+  const navigate = useNavigate();
+  const { isAuth } = useAuth();
 
-  //   useEffect(() => {
-  //     if (isAuth) {
-  //       navigate({ to: "/" });
-  //     }
-  //   }, [isAuth]);
+  useEffect(() => {
+    if (isAuth) {
+      navigate({ to: "/" });
+    }
+  }, [isAuth]);
 
   return (
     <div
@@ -25,7 +24,7 @@ const LoginPage: React.FC<{ className?: string }> = ({ className }) => {
       <LoginForm />
       <span>
         Don't have an account?{" "}
-        <Link to="/" className="underline">
+        <Link to="/login" className="underline">
           Register
         </Link>
       </span>

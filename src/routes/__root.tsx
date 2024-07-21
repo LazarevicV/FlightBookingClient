@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// import useAuth from "@/hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 import { Toaster } from "sonner";
 import { useState } from "react";
 import { IoMoon } from "react-icons/io5";
@@ -116,7 +116,7 @@ const Navigation = () => {
   );
 };
 const UserActions = () => {
-  // const { isAuth, logout, user } = useAuth();
+  const { isAuth, logout, user } = useAuth();
 
   const [dark, setDark] = useState(false);
 
@@ -133,7 +133,8 @@ const UserActions = () => {
           {!dark && <IoMoon />}
         </button>
       </div>
-      {/* {isAuth ? (
+
+      {isAuth ? (
         <>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -143,7 +144,7 @@ const UserActions = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>{user?.username}</DropdownMenuLabel>
+              <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
@@ -155,7 +156,7 @@ const UserActions = () => {
             Sign in
           </Link>
         </>
-      )} */}
+      )}
     </div>
   );
 };
