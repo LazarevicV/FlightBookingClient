@@ -28,14 +28,14 @@ function FlightForm() {
   const [destinationCity, setDestinationCity] = React.useState<
     string | undefined
   >();
-  const [date, setDate] = React.useState<DateRange | undefined>();
+  // const [date, setDate] = React.useState<DateRange | undefined>();
   const [isDirectFlight, setIsDirectFlight] = React.useState(false);
-  const [numberOfPassengers, setNumberOfPassengers] = React.useState(1);
+  // const [numberOfPassengers, setNumberOfPassengers] = React.useState(1);
   const [flights, setFlights] = React.useState<Flight[]>([]);
   const [searchInitiated, setSearchInitiated] = React.useState(false);
 
-  const formattedFromDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
-  const formattedToDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
+  // const formattedFromDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
+  // const formattedToDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
 
   const {
     data: cities,
@@ -50,17 +50,17 @@ function FlightForm() {
   if (isError) return <div>Error</div>;
 
   const handleSearch = async () => {
-    if (!departureCity || !destinationCity || !formattedFromDate) {
+    if (!departureCity || !destinationCity) {
       return;
     }
 
     const result: any = await getFlights(
       Number(departureCity),
       Number(destinationCity),
-      formattedFromDate,
-      formattedToDate,
-      isDirectFlight,
-      numberOfPassengers
+      // formattedFromDate,
+      // formattedToDate,
+      isDirectFlight
+      // numberOfPassengers
     );
 
     setFlights(result.departureFlights || result.returnFlights);
@@ -111,7 +111,7 @@ function FlightForm() {
             </Select>
           </div>
 
-          <div>
+          {/* <div>
             <Label className="block mb-2 text-sm font-medium text-gray-700">
               Broj putnika
             </Label>
@@ -122,14 +122,14 @@ function FlightForm() {
               onChange={(e) => setNumberOfPassengers(Number(e.target.value))}
               className="w-full p-2 border border-gray-300 rounded mt-1 dark:bg-white dark:text-black"
             />
-          </div>
+          </div> */}
 
-          <div>
+          {/* <div>
             <Label className="block mb-2 text-sm font-medium text-gray-700">
               Datum polaska
             </Label>
             <DatePickerWithRange date={date} setDate={setDate} />
-          </div>
+          </div> */}
         </div>
 
         <div className="mt-8 flex justify-center">
@@ -148,13 +148,13 @@ function FlightForm() {
         </div>
       </div>
 
-      {formattedFromDate && formattedToDate && (
+      {/* {formattedFromDate && formattedToDate && (
         <div className="mt-4 text-center">
           <p>
             Polazak: {formattedFromDate} Povratak: {formattedToDate}
           </p>
         </div>
-      )}
+      )} */}
 
       {searchInitiated && <FlightsList flights={flights} />}
     </>

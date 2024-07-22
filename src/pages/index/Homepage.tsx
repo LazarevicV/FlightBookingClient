@@ -8,7 +8,7 @@ function Homepage() {
   const navigate = useNavigate();
   const { isAuth } = useAuth();
 
-  console.log(isAuth);
+  // console.log(isAuth);
 
   useEffect(() => {
     if (!isAuth) {

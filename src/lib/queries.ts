@@ -5,18 +5,18 @@ import { City, FlightType } from "./types";
 export const getFlights = async (
   DepartureCityId: number,
   DestinationCityId: number,
-  DepartureDateTime: string,
-  ReturnDateTime: string,
-  NoStops: boolean,
-  NumberOfSeats: number
+  // DepartureDateTime: string,
+  // ReturnDateTime: string,
+  NoStops: boolean
+  // NumberOfSeats: number
 ): Promise<FlightType[]> => {
   const queryParams = new URLSearchParams({
     DepartureCityId: DepartureCityId.toString(),
     DestinationCityId: DestinationCityId.toString(),
-    DepartureDateTime,
-    ReturnDateTime,
+    // DepartureDateTime,
+    // ReturnDateTime,
     NoStops: NoStops.toString(),
-    NumberOfSeats: NumberOfSeats.toString(),
+    // NumberOfSeats: NumberOfSeats.toString(),
   });
 
   const res = await api({

@@ -1,145 +1,154 @@
 import { useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
-
 import { api } from "../services/api";
 import { TOKEN_KEY, USER_KEY } from "../lib/constants";
 import { useNavigate } from "@tanstack/react-router";
+import { isExpired, decodeToken } from "react-jwt";
 
 type AuthType = {
   email: string;
   password: string;
 };
 
+type TokenType = {
+  Email: string;
+  RoleId: string;
+  UserId: string;
+  aud: any;
+  exp: number;
+  iat: number;
+  iss: string;
+  jti: string;
+  nbf: number;
+};
+
 const useAuth = () => {
   const navigate = useNavigate();
-  const [value, setValue, removeValue] = useLocalStorage(TOKEN_KEY, null);
+  const [token, setToken, removeToken] = useLocalStorage<string | null>(
+    TOKEN_KEY,
+    null
+  );
   const [user, setUser, removeUser] = useLocalStorage<{
-    email: string;
-    role: string;
+    Email: string;
+    Role: string;
+    RoleId: string;
   } | null>(USER_KEY, null);
 
   const [error, setError] = useState<string>();
 
   const login = async ({ email, password }: AuthType) => {
-    await api({
-      endpoint: "api/Token",
-      config: {
-        method: "POST",
-        data: {
-          email,
-          password,
+    try {
+      const res = await api({
+        endpoint: "api/Token",
+        config: {
+          method: "POST",
+          data: {
+            email,
+            password,
+          },
         },
-      },
-    })
-      .then(async (res) => {
-        if (res.status === 200) {
-          setValue(res.data.token);
-
-          // await localVerify(res.data.token);
-          setError(undefined);
-        }
-      })
-      .catch((err) => {
-        removeUser();
-        removeValue();
-
-        if (err.response.status === 401) {
-          setError("Invalid email or password");
-          return;
-        }
-
-        if (err.response.status !== 200) {
-          setError("Something went wrong");
-          return;
-        }
       });
+
+      if (res.status === 200) {
+        const token = res.data.token;
+        setToken(token);
+
+        const decodedToken: TokenType | null = decodeToken<TokenType>(token);
+        console.log(decodedToken);
+
+        if (decodedToken) {
+          if (decodedToken.RoleId === "1") {
+            setUser({
+              Email: decodedToken.Email,
+              Role: "administrator",
+              RoleId: decodedToken.RoleId,
+            });
+          }
+          if (decodedToken.RoleId === "2") {
+            setUser({
+              Email: decodedToken.Email,
+              Role: "agent",
+              RoleId: decodedToken.RoleId,
+            });
+          }
+
+          if (decodedToken.RoleId === "3") {
+            setUser({
+              Email: decodedToken.Email,
+              Role: "posetilac",
+              RoleId: decodedToken.RoleId,
+            });
+          }
+        }
+
+        setError(undefined);
+      }
+    } catch (err) {
+      removeUser();
+      removeToken();
+
+      if (err) {
+        setError("Invalid email or password");
+      } else {
+        setError("Something went wrong");
+      }
+    }
   };
 
   const logout = () => {
-    removeValue();
+    removeToken();
     removeUser();
-
-    navigate({
-      to: "/",
-    });
+    navigate({ to: "/" });
   };
 
-  const register = ({ password, email }: AuthType) => {
-    api({
-      endpoint: "Auth/register",
-      config: {
-        method: "POST",
-        data: {
-          email,
-          password,
+  const register = async ({ email, password }: AuthType) => {
+    try {
+      const res = await api({
+        endpoint: "Auth/register",
+        config: {
+          method: "POST",
+          data: {
+            email,
+            password,
+          },
         },
-      },
-    })
-      .then(async (res) => {
-        if (res.status === 200) {
-          setValue(res.data.token);
-
-          // await localVerify(res.data.token);
-
-          setError(undefined);
-        }
-      })
-      .catch((err) => {
-        removeUser();
-        removeValue();
-
-        if (err.response.status === 409) {
-          setError("User already exists");
-
-          return;
-        }
-
-        if (err.response.status !== 200) {
-          setError("Something went wrong");
-          return;
-        }
       });
+
+      if (res.status === 200) {
+        const token = res.data.token;
+        setToken(token);
+
+        const decodedToken: TokenType | null = decodeToken<TokenType>(token);
+        console.log(decodedToken);
+
+        if (decodedToken) {
+          setUser({
+            Email: decodedToken.Email,
+            Role: decodedToken.RoleId === "1" ? "Admin" : "User",
+            RoleId: decodedToken.RoleId,
+          });
+        }
+
+        setError(undefined);
+      }
+    } catch (err) {
+      removeUser();
+      removeToken();
+
+      if (err) {
+        setError("User already exists");
+      } else {
+        setError("Something went wrong");
+      }
+    }
   };
 
-  // const localVerify = async (token: string) => {
-  //   await api({
-  //     endpoint: "Auth/me",
-  //     config: {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //     },
-  //   })
-  //     .then((res) => {
-  //       if (res.status === 200) {
-  //         setUser({
-  //           username: res.data.username,
-  //           role: res.data.role,
-  //         });
-  //       }
-  //     })
-  //     .catch(() => {
-  //       removeUser();
-  //       removeValue();
-  //     });
-  // };
-
-  // const verify = async () => {
-  //   if (!value) {
-  //     return;
-  //   }
-
-  //   return await localVerify(value);
-  // };
-
-  const isAuth = Boolean(value);
+  const isAuth = Boolean(token);
 
   return {
     login,
     user,
     logout,
-    // verify,
     register,
     error,
     isAuth,
