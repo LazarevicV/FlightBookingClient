@@ -81,7 +81,7 @@ export const makeReservation = async ({
     config: {
       method: "POST",
       headers: {
-        Authorization: 'Bearer ' + token,
+        Authorization: "Bearer " + token,
         "Content-Type": "application/json",
       },
       data: {
@@ -111,4 +111,24 @@ export const logoutRequest = async (): Promise<void> => {
       },
     },
   });
+};
+
+export const getReservationsForUser = async (): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: "api/Reservation",
+    config: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
+
+  return res.data;
 };
