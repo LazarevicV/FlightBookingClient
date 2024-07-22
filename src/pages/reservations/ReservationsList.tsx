@@ -1,12 +1,62 @@
 import useAuth from "@/hooks/useAuth";
-import { QUERY_KEYS } from "@/lib/constants";
+import { QUERY_KEYS, TOKEN_KEY } from "@/lib/constants";
 import { getReservationsForUser } from "@/lib/queries";
 import { Reservation, ReservationType } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
+import { decodeToken } from "react-jwt";
+
 
 function ReservationsList() {
   const { user } = useAuth();
+
+  type TokenType = {
+    Email: string;
+    RoleId: string;
+    UserId: string;
+    aud: any;
+    exp: number;
+    iat: number;
+    iss: string;
+    jti: string;
+    nbf: number;
+  };
+
+  const token = localStorage.getItem(TOKEN_KEY);
+  const decodedToken: TokenType | null = decodeToken<TokenType>(token);
+  
+  const newConnection = new HubConnectionBuilder()
+    .withUrl(`https://localhost:5001/liveUpdateHub`, {
+      accessTokenFactory: () => (decodedToken?.UserId.toString()? decodedToken?.UserId.toString(): ""),
+    })
+    .withAutomaticReconnect()
+    .build();
+
+    newConnection
+    .start()
+    .then(() => {
+    })
+    .catch(err => {
+      console.error('Failed to start the connection:', err);
+      if (err.message.includes('ERR_CONNECTION_REFUSED')) {
+      } else if (err.message.includes('Failed to fetch')) {
+        console.log('Failed to fetch error occurred');
+      }
+    });
+
+
+    useEffect(()=> {
+      if(newConnection != undefined){
+        newConnection.on("ReservationAdded", props=>{
+          console.log(props)
+          // Ovde samo dodaj na reservations listu ovaj props koji si dobio
+          
+        })
+
+        // console.log("radi")
+      }
+    }, [newConnection])
 
   const {
     data: reservations,
