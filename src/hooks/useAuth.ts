@@ -25,10 +25,13 @@ type TokenType = {
 
 const useAuth = () => {
   const navigate = useNavigate();
-  const [token, setToken, removeToken] = useLocalStorage<string | null>(
-    TOKEN_KEY,
-    null
-  );
+  // const [token, setToken, removeToken] = useLocalStorage<string | null>(
+  //   TOKEN_KEY,
+  //   null
+  // );
+
+  const token = localStorage.getItem(TOKEN_KEY)
+
   const [user, setUser, removeUser] = useLocalStorage<{
     Email: string;
     Role: string;
@@ -53,7 +56,8 @@ const useAuth = () => {
 
       if (res.status === 200) {
         const token = res.data.token;
-        setToken(token);
+        console.log(token);
+        localStorage.setItem(TOKEN_KEY, token);
 
         const decodedToken: TokenType | null = decodeToken<TokenType>(token);
         console.log(decodedToken);
@@ -90,7 +94,7 @@ const useAuth = () => {
       }
     } catch (err) {
       removeUser();
-      removeToken();
+      localStorage.removeItem(TOKEN_KEY);
 
       if (err) {
         setError("Invalid email or password");
@@ -106,7 +110,7 @@ const useAuth = () => {
     } catch (error) {
       console.error("Logout API error:", error);
     } finally {
-      removeToken();
+      localStorage.removeItem(TOKEN_KEY);
       removeUser();
       navigate({ to: "/" });
     }
@@ -127,7 +131,7 @@ const useAuth = () => {
 
       if (res.status === 200) {
         const token = res.data.token;
-        setToken(token);
+        localStorage.setItem(TOKEN_KEY, token)
 
         const decodedToken: TokenType | null = decodeToken<TokenType>(token);
         console.log(decodedToken);
@@ -145,7 +149,7 @@ const useAuth = () => {
       }
     } catch (err) {
       removeUser();
-      removeToken();
+      localStorage.removeItem(TOKEN_KEY);
 
       if (err) {
         setError("User already exists");

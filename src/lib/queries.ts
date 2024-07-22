@@ -72,7 +72,7 @@ export const makeReservation = async ({
     throw new Error("User is not authenticated");
   }
 
-  console.log(`Bearer ${token}`);
+  console.log(`${token}`);
   const decodedToken = decodeToken(token);
   console.log("Decoded token:", decodedToken);
 
@@ -81,7 +81,7 @@ export const makeReservation = async ({
     config: {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: 'Bearer ' + token,
         "Content-Type": "application/json",
       },
       data: {
