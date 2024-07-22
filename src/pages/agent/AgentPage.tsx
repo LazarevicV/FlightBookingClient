@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 // import { CoursesTab } from "./courses/CoursesTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FlightsTab } from "./flights/FlightsTab";
+import { ReservationsTab } from "./reservations/ReservationsTab";
 // import { SchoolsTab } from "./schools/SchoolsTab";
 
 const AgentPage: React.FC<{ className?: string }> = ({ className }) => {
@@ -17,7 +18,9 @@ const AgentPage: React.FC<{ className?: string }> = ({ className }) => {
         <TabsContent value="unos">
           <FlightsTab />
         </TabsContent>
-        <TabsContent value="potvrda">{/* <CoursesTab /> */}</TabsContent>
+        <TabsContent value="potvrda">
+          <ReservationsTab />
+        </TabsContent>
       </Tabs>
     </div>
   );

@@ -229,3 +229,45 @@ export const addFlight = async (
 
   return res.data;
 };
+
+export const approveReservation = async (id: string): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: `api/Reservation/approve/${id}`,
+    config: {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
+
+  return res.data;
+};
+
+export const rejectReservation = async (id: string): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: `api/Reservation/reject/${id}`,
+    config: {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
+
+  return res.data;
+};
