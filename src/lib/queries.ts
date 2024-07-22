@@ -1,5 +1,8 @@
 import { api } from "@/services/api";
-import { City, FlightType } from "./types";
+import { City, FlightType, ReservationType } from "./types";
+import useAuth from "@/hooks/useAuth";
+import { TOKEN_KEY } from "./constants";
+import { decodeToken } from "react-jwt";
 
 // Fetch flights based on parameters
 export const getFlights = async (
@@ -57,4 +60,55 @@ export const login = async (
     console.error("Login error:", error);
     throw error;
   }
+};
+
+export const makeReservation = async ({
+  flightId,
+  numberOfSeats,
+}: ReservationType): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  console.log(`Bearer ${token}`);
+  const decodedToken = decodeToken(token);
+  console.log("Decoded token:", decodedToken);
+
+  const res = await api({
+    endpoint: "api/Reservation",
+    config: {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      data: {
+        flightId,
+        numberOfSeats,
+      },
+    },
+  });
+
+  return res.data;
+};
+
+export const logoutRequest = async (): Promise<void> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  await api({
+    endpoint: "api/Token",
+    config: {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
 };
