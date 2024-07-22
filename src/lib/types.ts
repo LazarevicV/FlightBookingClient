@@ -31,3 +31,14 @@ export type ReservationType = {
   flightId: number;
   numberOfSeats: number;
 };
+
+export type Reservation = {
+  id: number;
+  departureCity: string;
+  destinationCity: string;
+  departureDateTime: string;
+  destinationDateTime: string;
+  fullName: string;
+  numberOfSeats: number;
+  status: string;
+};
