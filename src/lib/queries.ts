@@ -132,3 +132,100 @@ export const getReservationsForUser = async (): Promise<any> => {
 
   return res.data;
 };
+
+export const getAllReservations = async (): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: "api/Reservation/all",
+    config: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
+
+  return res.data;
+};
+
+export const deleteReservation = async (id: string): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: `api/Reservation/${id}`,
+    config: {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
+
+  return res.data;
+};
+
+export const getAllFlights = async (): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: "api/Flight",
+    config: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
+
+  return res.data;
+};
+
+export const addFlight = async (
+  departureCityId: string,
+  destinationCityId: string,
+  departureDateTime: string,
+  arrivalDateTime: string,
+  numberOfSeats: number,
+  numberOfStops: number
+): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: "api/Flight",
+    config: {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      data: {
+        departureCityId,
+        destinationCityId,
+        departureDateTime,
+        arrivalDateTime,
+        numberOfSeats,
+        numberOfStops,
+      },
+    },
+  });
+
+  return res.data;
+};

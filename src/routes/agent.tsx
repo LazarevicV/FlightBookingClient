@@ -1,4 +1,6 @@
 import { USER_KEY } from "@/lib/constants";
+import { AgentPage } from "@/pages/agent/AgentPage";
+import { PageSection } from "@/pages/PageSection";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/agent")({
@@ -11,5 +13,9 @@ export const Route = createFileRoute("/agent")({
       });
     }
   },
-  component: () => <div>Hello /agent!</div>,
+  component: () => (
+    <PageSection>
+      <AgentPage />
+    </PageSection>
+  ),
 });

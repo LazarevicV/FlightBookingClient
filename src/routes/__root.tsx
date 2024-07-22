@@ -85,14 +85,7 @@ const Navigation = () => {
       </Link>{" "}
       {isAuth && user?.Role === "posetilac" && (
         <>
-          <Link
-            to="/reservations"
-            className="[&.active]:font-bold"
-            search={{
-              filter: "",
-              search: "",
-            }}
-          >
+          <Link to="/reservations" className="[&.active]:font-bold">
             Reservations
           </Link>{" "}
         </>
