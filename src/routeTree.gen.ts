@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ReservationsImport } from './routes/reservations'
 import { Route as LoginImport } from './routes/login'
 import { Route as AgentImport } from './routes/agent'
 import { Route as AdminImport } from './routes/admin'
@@ -28,6 +29,11 @@ const AboutLazyRoute = AboutLazyImport.update({
   path: '/about',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+
+const ReservationsRoute = ReservationsImport.update({
+  path: '/reservations',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LoginRoute = LoginImport.update({
   path: '/login',
@@ -81,6 +87,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
+    '/reservations': {
+      id: '/reservations'
+      path: '/reservations'
+      fullPath: '/reservations'
+      preLoaderRoute: typeof ReservationsImport
+      parentRoute: typeof rootRoute
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -98,6 +111,7 @@ export const routeTree = rootRoute.addChildren({
   AdminRoute,
   AgentRoute,
   LoginRoute,
+  ReservationsRoute,
   AboutLazyRoute,
 })
 
@@ -113,6 +127,7 @@ export const routeTree = rootRoute.addChildren({
         "/admin",
         "/agent",
         "/login",
+        "/reservations",
         "/about"
       ]
     },
@@ -127,6 +142,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/login": {
       "filePath": "login.tsx"
+    },
+    "/reservations": {
+      "filePath": "reservations.tsx"
     },
     "/about": {
       "filePath": "about.lazy.tsx"
