@@ -6,9 +6,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { makeReservation } from "@/lib/queries";
 import { Flight, ReservationType } from "@/lib/types";
 import React from "react";
+import { toast } from "sonner";
 
 const ReservationModal: React.FC<{
   open: boolean;
@@ -17,7 +20,7 @@ const ReservationModal: React.FC<{
   refetchFlights: () => void;
 }> = ({ open, onOpenChange, flight, refetchFlights }) => {
   const [flightId, setFlightId] = React.useState(flight.id);
-  const [numberOfSeats, setNumberOfSeats] = React.useState(2);
+  const [numberOfSeats, setNumberOfSeats] = React.useState(1);
 
   const handleMakeReservation = async () => {
     const reservationInfo: ReservationType = {
@@ -28,8 +31,15 @@ const ReservationModal: React.FC<{
     console.log(result);
 
     // Refetch flights after making a reservation
-    refetchFlights();
+    toast.success("Reservation made successfully!");
     onOpenChange(false);
+    refetchFlights();
+  };
+
+  const handleChangeNumberOfSeats = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setNumberOfSeats(Number(e.target.value));
   };
 
   return (
@@ -39,9 +49,12 @@ const ReservationModal: React.FC<{
           <DialogTitle>Unos nove rezervacije</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-        <p>
-          Test: {flight.departureCity} - {flight.destinationCity}
-        </p>
+        <Label>Izaberite broj sedista</Label>
+        <Input
+          value={numberOfSeats}
+          onChange={handleChangeNumberOfSeats}
+          type="number"
+        />
         <div className="flex justify-center">
           <Button className="w-1/3" onClick={handleMakeReservation}>
             Make reservation
