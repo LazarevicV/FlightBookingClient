@@ -26,3 +26,8 @@ export type City = {
   id: string;
   name: string;
 };
+
+export type ReservationType = {
+  flightId: number;
+  numberOfSeats: number;
+};
