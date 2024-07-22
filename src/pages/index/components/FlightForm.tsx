@@ -1,8 +1,5 @@
-"use client";
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -11,15 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { getFlights, getCities } from "@/lib/queries";
 import { QUERY_KEYS } from "@/lib/constants";
-import { DatePickerWithRange } from "./DatePickerComponent";
 import FlightsList from "./FlightsList";
-import { City, Flight, FlightType } from "@/lib/types";
-import { DateRange } from "react-day-picker";
+import { City, Flight } from "@/lib/types";
+import { toast } from "sonner";
 
 function FlightForm() {
   const [departureCity, setDepartureCity] = React.useState<
@@ -28,44 +23,51 @@ function FlightForm() {
   const [destinationCity, setDestinationCity] = React.useState<
     string | undefined
   >();
-  // const [date, setDate] = React.useState<DateRange | undefined>();
   const [isDirectFlight, setIsDirectFlight] = React.useState(false);
-  // const [numberOfPassengers, setNumberOfPassengers] = React.useState(1);
-  const [flights, setFlights] = React.useState<Flight[]>([]);
   const [searchInitiated, setSearchInitiated] = React.useState(false);
-
-  // const formattedFromDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
-  // const formattedToDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
 
   const {
     data: cities,
-    isLoading,
-    isError,
+    isLoading: citiesLoading,
+    isError: citiesError,
   } = useQuery<City[]>({
     queryKey: [QUERY_KEYS.CITIES],
     queryFn: getCities,
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error</div>;
+  const {
+    data: flights,
+    isLoading: flightsLoading,
+    isError: flightsError,
+    refetch: refetchFlights,
+  } = useQuery<Flight[]>({
+    queryKey: [
+      QUERY_KEYS.FLIGHTS,
+      departureCity,
+      destinationCity,
+      isDirectFlight,
+    ],
+    // add ts-ignore for this line
+    // @ts-ignore
+    queryFn: () =>
+      getFlights(
+        Number(departureCity),
+        Number(destinationCity),
+        isDirectFlight
+      ),
+    enabled: searchInitiated,
+  });
+
+  if (citiesLoading) return <div>Loading...</div>;
+  if (citiesError) return <div>Error</div>;
 
   const handleSearch = async () => {
     if (!departureCity || !destinationCity) {
-      return;
+      return toast.error("Molimo izaberite gradove polaska i dolaska");
     }
 
-    const result: any = await getFlights(
-      Number(departureCity),
-      Number(destinationCity),
-      // formattedFromDate,
-      // formattedToDate,
-      isDirectFlight
-      // numberOfPassengers
-    );
-
-    setFlights(result.departureFlights || result.returnFlights);
-    console.log(flights);
     setSearchInitiated(true);
+    refetchFlights();
   };
 
   return (
@@ -102,7 +104,7 @@ function FlightForm() {
                 <SelectValue placeholder="Izaberite" />
               </SelectTrigger>
               <SelectContent>
-                {cities?.map((city) => (
+                {cities?.map((city: City) => (
                   <SelectItem key={city.id} value={city.id.toString()}>
                     {city.name}
                   </SelectItem>
@@ -110,26 +112,6 @@ function FlightForm() {
               </SelectContent>
             </Select>
           </div>
-
-          {/* <div>
-            <Label className="block mb-2 text-sm font-medium text-gray-700">
-              Broj putnika
-            </Label>
-            <Input
-              type="number"
-              min="1"
-              value={numberOfPassengers}
-              onChange={(e) => setNumberOfPassengers(Number(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded mt-1 dark:bg-white dark:text-black"
-            />
-          </div> */}
-
-          {/* <div>
-            <Label className="block mb-2 text-sm font-medium text-gray-700">
-              Datum polaska
-            </Label>
-            <DatePickerWithRange date={date} setDate={setDate} />
-          </div> */}
         </div>
 
         <div className="mt-8 flex justify-center">
@@ -148,15 +130,14 @@ function FlightForm() {
         </div>
       </div>
 
-      {/* {formattedFromDate && formattedToDate && (
-        <div className="mt-4 text-center">
-          <p>
-            Polazak: {formattedFromDate} Povratak: {formattedToDate}
-          </p>
-        </div>
-      )} */}
-
-      {searchInitiated && <FlightsList flights={flights} />}
+      {flightsLoading && <div>Loading...</div>}
+      {flightsError && <div>Error</div>}
+      {searchInitiated && (
+        <FlightsList
+          flights={flights as Flight[]}
+          refetchFlights={refetchFlights}
+        />
+      )}
     </>
   );
 }

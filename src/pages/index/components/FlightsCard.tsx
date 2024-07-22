@@ -3,7 +3,13 @@ import { Flight } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import ReservationModal from "./ReservationModal";
 
-function FlightsCard({ flight }: { flight: Flight }) {
+function FlightsCard({
+  flight,
+  refetchFlights,
+}: {
+  flight: Flight;
+  refetchFlights: () => void;
+}) {
   const [open, setOpen] = React.useState(false);
 
   const handleOpen = (open: boolean) => {
@@ -22,15 +28,15 @@ function FlightsCard({ flight }: { flight: Flight }) {
       <p className="text-gray-600 mb-1">
         Number of available seats: {flight.numberOfAvailableSpots}
       </p>
-      <Button
-        onClick={() => {
-          handleOpen(true);
-        }}
-        className="mt-4 px-4 py-2"
-      >
+      <Button onClick={() => handleOpen(true)} className="mt-4 px-4 py-2">
         Book Now
       </Button>
-      <ReservationModal open={open} onOpenChange={handleOpen} />
+      <ReservationModal
+        open={open}
+        onOpenChange={handleOpen}
+        flight={flight}
+        refetchFlights={refetchFlights}
+      />
     </div>
   );
 }
