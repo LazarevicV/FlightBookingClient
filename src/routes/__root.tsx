@@ -69,7 +69,7 @@ export const Route = createRootRoute({
 });
 
 const Navigation = () => {
-  // const { user, isAuth } = useAuth();
+  const { user, isAuth } = useAuth();
 
   return (
     <>
@@ -83,35 +83,30 @@ const Navigation = () => {
       <Link to="/" className="[&.active]:font-bold">
         Home
       </Link>{" "}
-      {/* {isAuth && (
+      {isAuth && user?.Role === "posetilac" && (
         <>
           <Link
-            to="/courses"
+            to="/reservations"
             className="[&.active]:font-bold"
             search={{
               filter: "",
               search: "",
             }}
           >
-            Courses
+            Reservations
           </Link>{" "}
-          <Link
-            to="/schools"
-            className="[&.active]:font-bold"
-            search={{ search: "" }}
-          >
-            Schools
-          </Link>
-          <Link to="/roadmaps" className="[&.active]:font-bold">
-            Roadmaps
-          </Link>
         </>
       )}
-      {user?.role === "admin" && (
+      {user?.Role === "administrator" && (
         <Link to="/admin" className="[&.active]:font-bold">
           Admin
         </Link>
-      )} */}
+      )}
+      {user?.Role === "agent" && (
+        <Link to="/agent" className="[&.active]:font-bold">
+          Agent
+        </Link>
+      )}
     </>
   );
 };
