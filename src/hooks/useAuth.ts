@@ -4,6 +4,7 @@ import { api } from "../services/api";
 import { TOKEN_KEY, USER_KEY } from "../lib/constants";
 import { useNavigate } from "@tanstack/react-router";
 import { isExpired, decodeToken } from "react-jwt";
+import { logoutRequest } from "@/lib/queries";
 
 type AuthType = {
   email: string;
@@ -32,6 +33,7 @@ const useAuth = () => {
     Email: string;
     Role: string;
     RoleId: string;
+    UserId: string;
   } | null>(USER_KEY, null);
 
   const [error, setError] = useState<string>();
@@ -62,6 +64,7 @@ const useAuth = () => {
               Email: decodedToken.Email,
               Role: "administrator",
               RoleId: decodedToken.RoleId,
+              UserId: decodedToken.UserId,
             });
           }
           if (decodedToken.RoleId === "2") {
@@ -69,6 +72,7 @@ const useAuth = () => {
               Email: decodedToken.Email,
               Role: "agent",
               RoleId: decodedToken.RoleId,
+              UserId: decodedToken.UserId,
             });
           }
 
@@ -77,6 +81,7 @@ const useAuth = () => {
               Email: decodedToken.Email,
               Role: "posetilac",
               RoleId: decodedToken.RoleId,
+              UserId: decodedToken.UserId,
             });
           }
         }
@@ -95,10 +100,16 @@ const useAuth = () => {
     }
   };
 
-  const logout = () => {
-    removeToken();
-    removeUser();
-    navigate({ to: "/" });
+  const logout = async () => {
+    try {
+      await logoutRequest();
+    } catch (error) {
+      console.error("Logout API error:", error);
+    } finally {
+      removeToken();
+      removeUser();
+      navigate({ to: "/" });
+    }
   };
 
   const register = async ({ email, password }: AuthType) => {
@@ -126,6 +137,7 @@ const useAuth = () => {
             Email: decodedToken.Email,
             Role: decodedToken.RoleId === "1" ? "Admin" : "User",
             RoleId: decodedToken.RoleId,
+            UserId: decodedToken.UserId,
           });
         }
 
