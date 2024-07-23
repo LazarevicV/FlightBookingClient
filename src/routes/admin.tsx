@@ -1,4 +1,6 @@
 import { USER_KEY } from "@/lib/constants";
+import { AdminPage } from "@/pages/admin/AdminPage";
+import { PageSection } from "@/pages/PageSection";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin")({
@@ -11,5 +13,10 @@ export const Route = createFileRoute("/admin")({
       });
     }
   },
-  component: () => <div>Hello /admin!</div>,
+  component: () => (
+    // <PageSection>
+    //   <AdminPage />
+    // </PageSection>
+    <AdminPage />
+  ),
 });
