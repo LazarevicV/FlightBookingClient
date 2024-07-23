@@ -10,8 +10,8 @@ const AdminPage: React.FC<{ className?: string }> = ({ className }) => {
     <div className={cn("w-full flex justify-center items-center", className)}>
       <Tabs defaultValue="dodavanje" className="max-w-4xl w-full">
         <TabsList>
-          <TabsTrigger value="dodavanje">Dodavanje novog korisnika</TabsTrigger>
-          <TabsTrigger value="potvrda">Pregled letova</TabsTrigger>
+          <TabsTrigger value="dodavanje">Add new user</TabsTrigger>
+          <TabsTrigger value="potvrda">Flights overview</TabsTrigger>
         </TabsList>
         <TabsContent value="dodavanje">
           <AddNewUser />

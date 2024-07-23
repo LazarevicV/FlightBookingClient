@@ -37,7 +37,10 @@ const ReservationsList: React.FC = () => {
               );
 
               if (reservationExists) {
-                console.warn("Duplicate reservation received:", updatedReservation);
+                console.warn(
+                  "Duplicate reservation received:",
+                  updatedReservation
+                );
                 return prevReservations; // Return the previous state without changes
               }
 
@@ -77,7 +80,6 @@ const ReservationsList: React.FC = () => {
             return updatedReservations;
           });
         });
-
 
         hubConnection.onclose((error) => {
           console.error("SignalR connection closed:", error);
@@ -135,15 +137,19 @@ const ReservationsList: React.FC = () => {
 
   return (
     <div>
-      <h1>Rezervacije za korisnika {user?.Email}</h1>
-      <div className="overflow-x-auto">
+      <h1 className="text-2xl">Reservations for user {user?.Email}</h1>
+      <div className="overflow-x-auto pt-5">
         <table className="table-auto w-full border-collapse border border-gray-200">
           <thead>
             <tr className="bg-gray-100">
               <th className="border border-gray-200 p-2">Departure City</th>
               <th className="border border-gray-200 p-2">Destination City</th>
-              <th className="border border-gray-200 p-2">Departure Date Time</th>
-              <th className="border border-gray-200 p-2">Destination Date Time</th>
+              <th className="border border-gray-200 p-2">
+                Departure Date Time
+              </th>
+              <th className="border border-gray-200 p-2">
+                Destination Date Time
+              </th>
               <th className="border border-gray-200 p-2">Full Name</th>
               <th className="border border-gray-200 p-2">Number of Seats</th>
               <th className="border border-gray-200 p-2">Status</th>

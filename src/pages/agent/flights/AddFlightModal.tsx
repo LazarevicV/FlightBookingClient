@@ -43,6 +43,15 @@ const AddFlightModal: React.FC<{
   const [numberOfSeats, setNumberOfSeats] = React.useState<number>(1);
   const [numberOfStops, setNumberOfStops] = React.useState<number>(0);
 
+  const resetForm = () => {
+    setDepartureDate("");
+    setArrivalDate("");
+    setDepartureCity("");
+    setDestinationCity("");
+    setNumberOfSeats(1);
+    setNumberOfStops(0);
+  };
+
   const handleAddFlight = () => {
     if (departureCity === "" || destinationCity === "") {
       toast.error("Departure and destination city are required");
@@ -61,16 +70,27 @@ const AddFlightModal: React.FC<{
       return;
     }
 
-    addMutation.mutate({
-      departureCityId: departureCity,
-      destinationCityId: destinationCity,
-      departureDateTime: departureDate,
-      arrivalDateTime: arrivalDate,
-      numberOfSeats,
-      numberOfStops,
-    });
-
-    onOpenChange(false);
+    addMutation.mutate(
+      {
+        departureCityId: departureCity,
+        destinationCityId: destinationCity,
+        departureDateTime: departureDate,
+        arrivalDateTime: arrivalDate,
+        numberOfSeats,
+        numberOfStops,
+      },
+      {
+        onSuccess: () => {
+          // Reset the form values after a successful mutation
+          resetForm();
+          toast.success("Flight added successfully!");
+          onOpenChange(false);
+        },
+        onError: (error: any) => {
+          toast.error("An error occurred while adding the flight");
+        },
+      }
+    );
   };
 
   const handleDepartureCityChange = (value: string) => {
@@ -105,11 +125,9 @@ const AddFlightModal: React.FC<{
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTitle></DialogTitle>
+      <DialogTitle>Add Flight</DialogTitle>
       <DialogContent className="max-h-[600px] overflow-scroll">
         <DialogHeader>
-          <h3>Add Flight</h3>
-          <DialogDescription></DialogDescription>
           <div className="flex flex-col align-middle gap-5">
             <div>
               <Label>Departure City</Label>

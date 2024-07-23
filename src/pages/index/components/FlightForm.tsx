@@ -64,11 +64,14 @@ function FlightForm() {
 
   const handleSearch = async () => {
     if (!departureCity || !destinationCity) {
-      return toast.error("Molimo izaberite gradove polaska i dolaska");
+      return toast.error(
+        "You need to select both departure and destination cities"
+      );
     }
 
     setSearchInitiated(true);
     const result = await refetch();
+    // @ts-ignore
     setPreviousFlights(result.data ?? previousFlights);
   };
 
@@ -79,16 +82,16 @@ function FlightForm() {
     <>
       <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
         <h2 className="text-2xl font-bold mb-6 text-center dark:text-black">
-          Pretraga letova
+          Search Flights
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <Label className="block mb-2 text-sm font-medium text-gray-700">
-              Izaberite grad polaska
+              Departure city
             </Label>
             <Select onValueChange={(value) => setDepartureCity(value)}>
               <SelectTrigger className="w-full dark:bg-white dark:text-black">
-                <SelectValue placeholder="Izaberite" />
+                <SelectValue placeholder="Choose departure city" />
               </SelectTrigger>
               <SelectContent>
                 {cities?.map((city: City) => (
@@ -102,11 +105,11 @@ function FlightForm() {
 
           <div>
             <Label className="block mb-2 text-sm font-medium text-gray-700">
-              Izaberite grad dolaska
+              Destionation city
             </Label>
             <Select onValueChange={(value) => setDestinationCity(value)}>
               <SelectTrigger className="w-full dark:bg-white dark:text-black">
-                <SelectValue placeholder="Izaberite" />
+                <SelectValue placeholder="Choose destionation city" />
               </SelectTrigger>
               <SelectContent>
                 {cities?.map((city: City) => (
@@ -120,7 +123,7 @@ function FlightForm() {
         </div>
 
         <div className="mt-8 flex justify-center">
-          <Button onClick={handleSearch}>Pretrazi</Button>
+          <Button onClick={handleSearch}>Search</Button>
         </div>
 
         <div className="mt-4 flex items-center">
@@ -130,7 +133,7 @@ function FlightForm() {
             className="mr-2"
           />
           <label htmlFor="directFlight" className="text-sm text-gray-700">
-            Direktan let
+            Direct flight
           </label>
         </div>
       </div>
@@ -139,6 +142,7 @@ function FlightForm() {
       {flightsError && <div>Error</div>}
       {(searchInitiated || previousFlights) && (
         <FlightsList
+          // @ts-ignore
           flights={flights?.length ? flights : (previousFlights ?? [])}
           refetchFlights={refetch}
         />

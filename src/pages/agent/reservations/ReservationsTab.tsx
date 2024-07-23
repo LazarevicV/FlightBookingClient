@@ -27,29 +27,30 @@ const ReservationsTab: React.FC<{ className?: string }> = ({ className }) => {
           .withAutomaticReconnect()
           .build();
 
-          hubConnection.on(
-            "ReservationAdded",
-            (updatedReservation: Reservation) => {
-              console.log("Received updated reservation:", updatedReservation);
-  
-              setReservations((prevReservations) => {
-                // Check if the reservation already exists
-                const reservationExists = prevReservations.some(
-                  (reservation) => reservation.id === updatedReservation.id
+        hubConnection.on(
+          "ReservationAdded",
+          (updatedReservation: Reservation) => {
+            console.log("Received updated reservation:", updatedReservation);
+
+            setReservations((prevReservations) => {
+              const reservationExists = prevReservations.some(
+                (reservation) => reservation.id === updatedReservation.id
+              );
+
+              if (reservationExists) {
+                console.warn(
+                  "Duplicate reservation received:",
+                  updatedReservation
                 );
-  
-                if (reservationExists) {
-                  console.warn("Duplicate reservation received:", updatedReservation);
-                  return prevReservations; // Return the previous state without changes
-                }
-  
-                return [...prevReservations, updatedReservation];
-              });
-  
-              toast.success("Reservation updated");
-            }
-          );
-  
+                return prevReservations;
+              }
+
+              return [...prevReservations, updatedReservation];
+            });
+
+            toast.success("Reservation updated", { position: "top-right" });
+          }
+        );
 
         hubConnection.on("ReservationApproved", (updatedReservation) => {
           console.log("Received updated reservation:", updatedReservation);
@@ -97,7 +98,6 @@ const ReservationsTab: React.FC<{ className?: string }> = ({ className }) => {
         console.log("SignalR connected successfully");
         setConnection(hubConnection);
 
-        // Fetch initial reservations
         const initialReservations = await getAllReservations();
         setReservations(initialReservations);
       } catch (err) {
@@ -115,20 +115,24 @@ const ReservationsTab: React.FC<{ className?: string }> = ({ className }) => {
   const handleApprove = async (reservation: any) => {
     try {
       await approveReservation(reservation.id);
-      toast.success("Reservation approved successfully");
+      toast.success("Reservation approved successfully", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error approving reservation:", error);
-      toast.error("Failed to approve reservation");
+      toast.error("Failed to approve reservation", { position: "top-right" });
     }
   };
 
   const handleReject = async (reservation: any) => {
     try {
       await rejectReservation(reservation.id);
-      toast.success("Reservation rejected successfully");
+      toast.success("Reservation rejected successfully", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error rejecting reservation:", error);
-      toast.error("Failed to reject reservation");
+      toast.error("Failed to reject reservation", { position: "top-right" });
     }
   };
 

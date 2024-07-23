@@ -24,16 +24,47 @@ const ReservationModal: React.FC<{
 
   const handleMakeReservation = async () => {
     const reservationInfo: ReservationType = {
-      flightId: flight.id,
+      flightId: Number(flightId),
       numberOfSeats: numberOfSeats,
     };
-    const result = await makeReservation(reservationInfo);
-    console.log(result);
 
-    // Refetch flights after making a reservation
-    toast.success("Reservation made successfully!");
-    onOpenChange(false);
-    refetchFlights();
+    const currentDate = new Date();
+    const departureDate = new Date(flight.departureDateTime ?? "");
+    const timeDifference = departureDate.getTime() - currentDate.getTime();
+    const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+    if (daysDifference < 3) {
+      toast.error("Cannot book a flight within 3 days of departure");
+      return;
+    }
+
+    if (reservationInfo.numberOfSeats < 1) {
+      toast.error("Number of seats must be greater than 0");
+      return;
+    }
+
+    if (
+      flight.numberOfAvailableSpots !== undefined &&
+      reservationInfo.numberOfSeats > flight.numberOfAvailableSpots
+    ) {
+      toast.error("Not enough available spots");
+      return;
+    }
+
+    try {
+      const result = await makeReservation(reservationInfo);
+      console.log(result);
+
+      toast.success("Reservation made successfully!");
+      onOpenChange(false);
+      refetchFlights();
+    } catch (error: any) {
+      if (error.response && error.response.status === 500) {
+        toast.error("Cannot book a flight within 3 days of departure");
+      } else {
+        toast.error("An error occurred while making the reservation");
+      }
+    }
   };
 
   const handleChangeNumberOfSeats = (
@@ -46,14 +77,16 @@ const ReservationModal: React.FC<{
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Unos nove rezervacije</DialogTitle>
+          <DialogTitle>New reservation</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-        <Label>Izaberite broj sedista</Label>
+        <Label>Choose how many seats do you want</Label>
         <Input
           value={numberOfSeats}
           onChange={handleChangeNumberOfSeats}
           type="number"
+          min={1}
+          max={flight.numberOfAvailableSpots}
         />
         <div className="flex justify-center">
           <Button className="w-1/3" onClick={handleMakeReservation}>

@@ -1,14 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Flight } from "@/lib/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/constants";
@@ -30,22 +22,22 @@ const AdminFlights: React.FC<{ className?: string }> = ({ className }) => {
   const cancelMutation = useMutation({
     mutationFn: cancelFlight,
     onSuccess: () => {
-      refetch(); // Refetch flights after a successful cancellation
-      toast.success("Flight canceled successfully");
+      refetch();
+      toast.success("Flight canceled successfully", { position: "top-right" });
     },
     onError: () => {
-      toast.error("Failed to cancel flight");
+      toast.error("Failed to cancel flight", { position: "top-right" });
     },
   });
 
   const approveMutation = useMutation({
     mutationFn: approveFlight,
     onSuccess: () => {
-      refetch(); // Refetch flights after a successful cancellation
-      toast.success("Flight approved successfully");
+      refetch();
+      toast.success("Flight approved successfully", { position: "top-right" });
     },
     onError: () => {
-      toast.error("Failed to approve flight");
+      toast.error("Failed to approve flight", { position: "top-right" });
     },
   });
 

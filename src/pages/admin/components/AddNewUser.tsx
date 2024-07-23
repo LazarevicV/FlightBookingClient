@@ -73,7 +73,6 @@ const AddNewUser: React.FC<{ className?: string }> = ({ className }) => {
       );
 
       if (result.status === 500) {
-        // Assuming 409 Conflict for existing email
         toast.error("User with that email already exists");
       } else if (result.status === 204) {
         console.log("User added successfully");
