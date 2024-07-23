@@ -1,18 +1,25 @@
 import { useNavigate } from "@tanstack/react-router";
-import { PageSection } from "../PageSection";
 import FlightForm from "./components/FlightForm";
 import useAuth from "@/hooks/useAuth";
 import { useEffect } from "react";
 
 function Homepage() {
   const navigate = useNavigate();
-  const { isAuth } = useAuth();
+  const { isAuth, user } = useAuth();
 
   // console.log(isAuth);
 
   useEffect(() => {
     if (!isAuth) {
       navigate({ to: "/login" });
+    }
+
+    if (user?.Role === "agent") {
+      navigate({ to: "/agent" });
+    }
+
+    if (user?.Role === "administrator") {
+      navigate({ to: "/admin" });
     }
   }, [isAuth]);
 
