@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -25,6 +25,11 @@ function FlightForm() {
   >();
   const [isDirectFlight, setIsDirectFlight] = React.useState(false);
   const [searchInitiated, setSearchInitiated] = React.useState(false);
+  const [previousFlights, setPreviousFlights] = React.useState<Flight[] | null>(
+    null
+  );
+
+  const queryClient = useQueryClient();
 
   const {
     data: cities,
@@ -39,7 +44,7 @@ function FlightForm() {
     data: flights,
     isLoading: flightsLoading,
     isError: flightsError,
-    refetch: refetchFlights,
+    refetch,
   } = useQuery<Flight[]>({
     queryKey: [
       QUERY_KEYS.FLIGHTS,
@@ -47,7 +52,6 @@ function FlightForm() {
       destinationCity,
       isDirectFlight,
     ],
-    // add ts-ignore for this line
     // @ts-ignore
     queryFn: () =>
       getFlights(
@@ -55,11 +59,8 @@ function FlightForm() {
         Number(destinationCity),
         isDirectFlight
       ),
-    enabled: searchInitiated,
+    enabled: false,
   });
-
-  if (citiesLoading) return <div>Loading...</div>;
-  if (citiesError) return <div>Error</div>;
 
   const handleSearch = async () => {
     if (!departureCity || !destinationCity) {
@@ -67,8 +68,12 @@ function FlightForm() {
     }
 
     setSearchInitiated(true);
-    refetchFlights();
+    const result = await refetch();
+    setPreviousFlights(result.data ?? previousFlights);
   };
+
+  if (citiesLoading) return <div>Loading...</div>;
+  if (citiesError) return <div>Error</div>;
 
   return (
     <>
@@ -132,10 +137,10 @@ function FlightForm() {
 
       {flightsLoading && <div>Loading...</div>}
       {flightsError && <div>Error</div>}
-      {searchInitiated && (
+      {(searchInitiated || previousFlights) && (
         <FlightsList
-          flights={flights as Flight[]}
-          refetchFlights={refetchFlights}
+          flights={flights?.length ? flights : (previousFlights ?? [])}
+          refetchFlights={refetch}
         />
       )}
     </>
