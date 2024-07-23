@@ -1,7 +1,6 @@
 import React from "react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-
 import {
   Select,
   SelectItem,
@@ -14,19 +13,20 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { QUERY_KEYS } from "@/lib/constants";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { DialogTitle } from "@radix-ui/react-dialog";
-import { addFlight, getCities } from "@/lib/queries";
 import { City } from "@/lib/types";
+import { addFlightWrapper, getCities } from "@/lib/queries";
 
 const AddFlightModal: React.FC<{
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}> = ({ open, onOpenChange }) => {
+  addMutation: any; // Update this to use the appropriate type if needed
+}> = ({ open, onOpenChange, addMutation }) => {
   const {
     data: cities,
     isLoading: citiesLoading,
@@ -43,16 +43,7 @@ const AddFlightModal: React.FC<{
   const [numberOfSeats, setNumberOfSeats] = React.useState<number>(1);
   const [numberOfStops, setNumberOfStops] = React.useState<number>(0);
 
-  const handleAddFlight = async () => {
-    console.log(
-      departureCity,
-      destinationCity,
-      departureDate,
-      arrivalDate,
-      numberOfSeats,
-      numberOfStops
-    );
-
+  const handleAddFlight = () => {
     if (departureCity === "" || destinationCity === "") {
       toast.error("Departure and destination city are required");
       return;
@@ -70,18 +61,15 @@ const AddFlightModal: React.FC<{
       return;
     }
 
-    const result = await addFlight(
-      departureCity,
-      destinationCity,
-      departureDate,
-      arrivalDate,
+    addMutation.mutate({
+      departureCityId: departureCity,
+      destinationCityId: destinationCity,
+      departureDateTime: departureDate,
+      arrivalDateTime: arrivalDate,
       numberOfSeats,
-      numberOfStops
-    );
+      numberOfStops,
+    });
 
-    console.log(result);
-
-    toast.success("Flight added successfully");
     onOpenChange(false);
   };
 
@@ -124,10 +112,10 @@ const AddFlightModal: React.FC<{
           <DialogDescription></DialogDescription>
           <div className="flex flex-col align-middle gap-5">
             <div>
-              <Label>Polazni grad</Label>
+              <Label>Departure City</Label>
               <Select onValueChange={handleDepartureCityChange}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder="Izaberite polazni grad" />
+                  <SelectValue placeholder="Select departure city" />
                 </SelectTrigger>
                 <SelectContent>
                   {cities?.map((city) => (
@@ -139,10 +127,10 @@ const AddFlightModal: React.FC<{
               </Select>
             </div>
             <div>
-              <Label>Dolazni grad</Label>
+              <Label>Destination City</Label>
               <Select onValueChange={handleDestinationCityChange}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder="Izaberite dolazni grad" />
+                  <SelectValue placeholder="Select destination city" />
                 </SelectTrigger>
                 <SelectContent>
                   {cities?.map((city) => (
@@ -154,7 +142,7 @@ const AddFlightModal: React.FC<{
               </Select>
             </div>
             <div>
-              <Label>Datum polaska</Label>
+              <Label>Departure Date</Label>
               <Input
                 type="date"
                 value={departureDate}
@@ -162,7 +150,7 @@ const AddFlightModal: React.FC<{
               />
             </div>
             <div>
-              <Label>Datum dolaska</Label>
+              <Label>Arrival Date</Label>
               <Input
                 type="date"
                 value={arrivalDate}
@@ -170,7 +158,7 @@ const AddFlightModal: React.FC<{
               />
             </div>
             <div>
-              <Label>Broj presedanja</Label>
+              <Label>Number of Stops</Label>
               <Input
                 type="number"
                 value={numberOfStops}
@@ -178,7 +166,7 @@ const AddFlightModal: React.FC<{
               />
             </div>
             <div>
-              <Label>Broj mesta</Label>
+              <Label>Number of Seats</Label>
               <Input
                 type="number"
                 value={numberOfSeats}
@@ -186,7 +174,7 @@ const AddFlightModal: React.FC<{
               />
             </div>
             <div>
-              <Button onClick={handleAddFlight}>Dodajte let</Button>
+              <Button onClick={handleAddFlight}>Add Flight</Button>
             </div>
           </div>
         </DialogHeader>

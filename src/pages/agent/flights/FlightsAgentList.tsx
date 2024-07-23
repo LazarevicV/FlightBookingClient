@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { QUERY_KEYS } from "@/lib/constants";
 import {
+  addFlight,
+  addFlightWrapper,
   deleteReservation,
   getAllFlights,
   getAllReservations,
@@ -19,7 +21,7 @@ import { toast } from "sonner";
 // import { CourseType } from "@/lib/types";
 
 const FlightAgentList: React.FC<{ className?: string }> = ({ className }) => {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: [QUERY_KEYS.FLIGHTS],
     queryFn: getAllFlights,
   });
@@ -60,9 +62,15 @@ const FlightCard = ({ flight }: { flight: Flight }) => {
   const handleOpen = (open: boolean) => {
     setOpen(open);
   };
+  const availableSpots = Number(flight.numberOfAvailableSpots);
+
   return (
     <>
-      <tr className="even:bg-gray-50">
+      {/* color is red if the flight.numberOfAvailableSpots is less than 5 */}
+
+      <tr
+        className={`${availableSpots < 5 ? "bg-red-100" : "odd:bg-gray-100"} `}
+      >
         <td className="border border-gray-200 p-2">{flight.departureCity}</td>
         <td className="border border-gray-200 p-2">{flight.destinationCity}</td>
         <td className="border border-gray-200 p-2">
