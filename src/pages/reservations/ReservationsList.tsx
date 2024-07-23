@@ -4,6 +4,7 @@ import useAuth from "@/hooks/useAuth";
 import { Reservation } from "@/lib/types";
 import { toast } from "sonner";
 import { TOKEN_KEY } from "@/lib/constants";
+import { getReservationsForUser } from "@/lib/queries";
 
 const ReservationsList: React.FC = () => {
   const { user } = useAuth();
@@ -25,36 +26,58 @@ const ReservationsList: React.FC = () => {
           .build();
 
         hubConnection.on(
-          "ReceiveReservationUpdate",
+          "ReservationAdded",
           (updatedReservation: Reservation) => {
             console.log("Received updated reservation:", updatedReservation);
 
             setReservations((prevReservations) => {
-              const updatedReservations = prevReservations.map((reservation) =>
-                reservation.id === updatedReservation.id
-                  ? { ...reservation, ...updatedReservation }
-                  : reservation
+              // Check if the reservation already exists
+              const reservationExists = prevReservations.some(
+                (reservation) => reservation.id === updatedReservation.id
               );
 
-              console.log("Updated reservations:", updatedReservations);
-              return updatedReservations;
+              if (reservationExists) {
+                console.warn("Duplicate reservation received:", updatedReservation);
+                return prevReservations; // Return the previous state without changes
+              }
+
+              return [...prevReservations, updatedReservation];
             });
 
             toast.success("Reservation updated");
           }
         );
 
-        hubConnection.on("ReservationDeleted", (reservationId: number) => {
-          console.log("Received deleted reservation:", reservationId);
+        hubConnection.on("ReservationApproved", (updatedReservation) => {
+          console.log("Received updated reservation:", updatedReservation);
 
-          setReservations((prevReservations) =>
-            prevReservations.filter(
-              (reservation) => reservation.id !== reservationId
-            )
-          );
+          setReservations((prevReservations) => {
+            const updatedReservations = prevReservations.map((reservation) =>
+              reservation.id === updatedReservation.id
+                ? { ...reservation, ...updatedReservation }
+                : reservation
+            );
 
-          toast.error("Reservation deleted");
+            console.log("Updated reservations:", updatedReservations);
+            return updatedReservations;
+          });
         });
+
+        hubConnection.on("ReservationRejected", (updatedReservation) => {
+          console.log("Received rejected reservation:", updatedReservation);
+
+          setReservations((prevReservations) => {
+            const updatedReservations = prevReservations.map((reservation) =>
+              reservation.id === updatedReservation.id
+                ? { ...reservation, ...updatedReservation }
+                : reservation
+            );
+
+            console.log("Updated reservations:", updatedReservations);
+            return updatedReservations;
+          });
+        });
+
 
         hubConnection.onclose((error) => {
           console.error("SignalR connection closed:", error);
@@ -71,19 +94,6 @@ const ReservationsList: React.FC = () => {
         await hubConnection.start();
         console.log("SignalR connected successfully");
         setConnection(hubConnection);
-
-        // Fetch initial reservations
-        hubConnection
-          .invoke("getReservationsForUser", user?.Email)
-          .then((initialReservations: Reservation[]) => {
-            setReservations(initialReservations);
-            setLoading(false);
-          })
-          .catch((err) => {
-            console.error("Error fetching initial reservations", err);
-            setError(true);
-            setLoading(false);
-          });
       } catch (err) {
         console.error("Failed to connect to SignalR:", err);
         setError(true);
@@ -96,7 +106,28 @@ const ReservationsList: React.FC = () => {
     return () => {
       connection?.stop();
     };
-  }, [user?.Email]);
+  }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const result = await getReservationsForUser();
+        console.log(result);
+        setReservations(result);
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to fetch reservations:", err);
+        setError(true);
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    console.log("Reservations ", reservations);
+  }, [reservations]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error...</div>;
@@ -111,12 +142,8 @@ const ReservationsList: React.FC = () => {
             <tr className="bg-gray-100">
               <th className="border border-gray-200 p-2">Departure City</th>
               <th className="border border-gray-200 p-2">Destination City</th>
-              <th className="border border-gray-200 p-2">
-                Departure Date Time
-              </th>
-              <th className="border border-gray-200 p-2">
-                Destination Date Time
-              </th>
+              <th className="border border-gray-200 p-2">Departure Date Time</th>
+              <th className="border border-gray-200 p-2">Destination Date Time</th>
               <th className="border border-gray-200 p-2">Full Name</th>
               <th className="border border-gray-200 p-2">Number of Seats</th>
               <th className="border border-gray-200 p-2">Status</th>

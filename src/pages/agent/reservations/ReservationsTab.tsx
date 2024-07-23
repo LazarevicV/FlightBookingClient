@@ -9,6 +9,7 @@ import {
 } from "@/lib/queries";
 import { TOKEN_KEY } from "@/lib/constants";
 import { toast } from "sonner";
+import { Reservation } from "@/lib/types";
 
 const ReservationsTab: React.FC<{ className?: string }> = ({ className }) => {
   const [reservations, setReservations] = useState<any[]>([]);
@@ -25,6 +26,30 @@ const ReservationsTab: React.FC<{ className?: string }> = ({ className }) => {
           })
           .withAutomaticReconnect()
           .build();
+
+          hubConnection.on(
+            "ReservationAdded",
+            (updatedReservation: Reservation) => {
+              console.log("Received updated reservation:", updatedReservation);
+  
+              setReservations((prevReservations) => {
+                // Check if the reservation already exists
+                const reservationExists = prevReservations.some(
+                  (reservation) => reservation.id === updatedReservation.id
+                );
+  
+                if (reservationExists) {
+                  console.warn("Duplicate reservation received:", updatedReservation);
+                  return prevReservations; // Return the previous state without changes
+                }
+  
+                return [...prevReservations, updatedReservation];
+              });
+  
+              toast.success("Reservation updated");
+            }
+          );
+  
 
         hubConnection.on("ReservationApproved", (updatedReservation) => {
           console.log("Received updated reservation:", updatedReservation);
