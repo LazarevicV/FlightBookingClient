@@ -5,4 +5,5 @@ export const QUERY_KEYS = {
   FLIGHTS: "flight",
   CITIES: "cities", // Added for city selection
   RESERVATIONS: "reservations",
+  ROLES: "roles",
 };

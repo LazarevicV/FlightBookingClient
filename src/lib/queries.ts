@@ -271,3 +271,136 @@ export const rejectReservation = async (id: string): Promise<any> => {
 
   return res.data;
 };
+
+export const getRoles = async (): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: "api/Role",
+    config: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
+
+  return res.data;
+};
+
+export const addNewUser = async (
+  email: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+  roleId: number
+): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: "api/User",
+    config: {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      data: {
+        firstName,
+        lastName,
+        email,
+        password,
+        roleId,
+      },
+    },
+  });
+  // console.log(res);
+
+  return res;
+};
+
+export const cancelFlight = async (id: string): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: `api/Flight/reject/${id}`,
+    config: {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
+
+  return res.data;
+};
+
+export const addFlightWrapper = async (flightDetails: {
+  departureCityId: string;
+  destinationCityId: string;
+  departureDateTime: string;
+  arrivalDateTime: string;
+  numberOfSeats: number;
+  numberOfStops: number;
+}): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: "api/Flight",
+    config: {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      data: {
+        departureCityId: flightDetails.departureCityId,
+        destinationCityId: flightDetails.destinationCityId,
+        departureDateTime: flightDetails.departureDateTime,
+        arrivalDateTime: flightDetails.arrivalDateTime,
+        numberOfSeats: flightDetails.numberOfSeats,
+        numberOfStops: flightDetails.numberOfStops,
+      },
+    },
+  });
+
+  return res.data;
+};
+
+export const approveFlight = async (id: string): Promise<any> => {
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  const res = await api({
+    endpoint: `api/Flight/approve/${id}`,
+    config: {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    },
+  });
+
+  return res.data;
+};

@@ -42,3 +42,8 @@ export type Reservation = {
   numberOfSeats: number;
   status: string;
 };
+
+export type Roles = {
+  id: number;
+  name: string;
+};
